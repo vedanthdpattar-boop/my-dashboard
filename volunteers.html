@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloodRelief Command — Volunteer &amp; Donate</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { margin:0; }
+  .dash { font-family: 'DM Sans', sans-serif; background: #0B1622; color: #E8EEF4; min-height: 100vh; }
+
+  .navbar { background: #0F1D2E; border-bottom: 1px solid #1E3A5A; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
+  .navbar a { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: #7A9BBC; text-decoration: none; padding: 12px 16px; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; letter-spacing: 0.5px; }
+  .navbar a:hover { color: #C5D8EC; }
+  .navbar a.active { color: #F59E0B; border-bottom-color: #F59E0B; }
+
+  .topbar { background: #0F1D2E; border-bottom: 1px solid #1E3A5A; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: #E8EEF4; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+  .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: #F59E0B; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+  .live-badge { background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase; animation: pulse 1.6s infinite; }
+  .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: #7A9BBC; }
+  .alert-ticker { background: #F59E0B; color: #0B1622; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px; }
+
+  .page-wrap { padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .page-sub { font-size: 12px; color: #5A8AB5; margin-bottom: 22px; }
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #4A7DAA; margin-bottom: 14px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; margin-bottom: 20px; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+
+  .panel { background: #0F1D2E; border: 1px solid #1E3A5A; border-radius: 12px; padding: 20px; }
+
+  /* Donation */
+  .amount-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .amount-btn { background: #1A2F46; border: 1px solid #2A4D6E; color: #C5D8EC; border-radius: 8px; padding: 12px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+  .amount-btn:hover { background: #234060; }
+  .amount-btn.active { background: rgba(20,184,166,0.2); border-color: #14B8A6; color: #2DD4BF; }
+
+  .custom-input-row { display: flex; align-items: center; gap: 8px; background: #0B1622; border: 1px solid #1E3A5A; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; }
+  .custom-input-row span { color: #5A8AB5; font-size: 14px; font-weight: 700; }
+  .custom-input-row input { flex: 1; background: transparent; border: none; color: #E8EEF4; font-size: 16px; font-family: 'Space Grotesk', sans-serif; font-weight: 700; outline: none; }
+
+  .impact-line { display: flex; justify-content: space-between; align-items: center; background: #0B1622; border: 1px solid #1A2F46; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; font-size: 12px; color: #A0BECF; }
+  .impact-line strong { color: #FCD34D; font-family: 'Space Grotesk', sans-serif; }
+
+  .alloc-row { margin-bottom: 12px; }
+  .alloc-head { display: flex; justify-content: space-between; font-size: 12px; color: #A0BECF; margin-bottom: 5px; }
+  .r-bar-track { height: 7px; background: #1A2F46; border-radius: 4px; overflow: hidden; }
+  .r-bar-fill { height: 100%; border-radius: 4px; }
+  .fill-teal { background: #14B8A6; }
+  .fill-red { background: #EF4444; }
+  .fill-blue { background: #3B82F6; }
+  .fill-amber { background: #F59E0B; }
+
+  .donate-btn { width: 100%; background: #F59E0B; color: #0B1622; border: none; border-radius: 8px; padding: 13px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 6px; letter-spacing: 0.5px; transition: background 0.15s, transform 0.1s; }
+  .donate-btn:hover { background: #FBBF24; transform: translateY(-1px); }
+  .donate-btn:active { transform: scale(0.98); }
+
+  /* Volunteer form */
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 11px; color: #7A9BBC; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; font-weight: 600; }
+  .form-input, .form-select { width: 100%; background: #0B1622; border: 1px solid #1E3A5A; border-radius: 8px; padding: 10px 12px; color: #E8EEF4; font-size: 13px; font-family: 'DM Sans', sans-serif; }
+  .form-input:focus, .form-select:focus { outline: none; border-color: #F59E0B; }
+  .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .skill-chip { background: #1A2F46; border: 1px solid #2A4D6E; color: #C5D8EC; border-radius: 7px; padding: 8px; font-size: 12px; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .skill-chip.on { background: rgba(20,184,166,0.2); border-color: #14B8A6; color: #2DD4BF; }
+  .submit-btn { width: 100%; background: #14B8A6; color: #0B1622; border: none; border-radius: 8px; padding: 13px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 6px; transition: background 0.15s; }
+  .submit-btn:hover { background: #2DD4BF; }
+
+  /* Drop locations */
+  .drop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .drop-card { background: #0F1D2E; border: 1px solid #1E3A5A; border-radius: 10px; padding: 14px; }
+  .drop-name { font-size: 13px; font-weight: 600; color: #E8EEF4; margin-bottom: 4px; font-family: 'Space Grotesk', sans-serif; }
+  .drop-addr { font-size: 11px; color: #5A8AB5; margin-bottom: 8px; line-height: 1.4; }
+  .drop-need { font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(245,158,11,0.2); color: #FCD34D; display: inline-block; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat-card { background: #0F1D2E; border: 1px solid #1E3A5A; border-radius: 10px; padding: 14px 14px 12px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .stat-card.red::before { background: #EF4444; }
+  .stat-card.amber::before { background: #F59E0B; }
+  .stat-card.teal::before { background: #14B8A6; }
+  .stat-card.blue::before { background: #3B82F6; }
+  .stat-label { font-size: 10px; color: #5A8AB5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: #E8EEF4; line-height: 1; margin-bottom: 4px; }
+  .stat-value.red { color: #EF4444; }
+  .stat-value.amber { color: #F59E0B; }
+  .stat-value.teal { color: #14B8A6; }
+  .stat-value.blue { color: #3B82F6; }
+  .stat-sub { font-size: 10px; color: #4A7DAA; }
+
+  .confirm-box { display:none; background: rgba(20,184,166,0.12); border: 1px solid #14B8A6; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 12px; color: #2DD4BF; }
+  .confirm-box.show { display: block; }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html">Dashboard</a>
+  <a href="teams.html">Relief Teams</a>
+  <a href="analytics.html">Analytics &amp; Reports</a>
+  <a href="volunteers.html" class="active">Volunteer &amp; Donate</a>
+</nav>
+<div class="dash">
+  <div class="topbar">
+    <div class="brand"><div class="brand-dot"></div> FloodRelief Command</div>
+    <div class="topbar-right">
+      <span class="alert-ticker">⚠ ACTIVE DISASTER</span>
+      <span>District: Kaveri Rural | Day 3</span>
+      <span class="live-badge">LIVE</span>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-title">Volunteer &amp; Donate</div>
+    <div class="page-sub">Contribute funds, supplies, or your time to support relief operations in Kaveri Rural district.</div>
+
+    <div class="stats-row">
+      <div class="stat-card teal"><div class="stat-label">Funds Raised</div><div class="stat-value teal" id="funds-raised">₹8.4L</div><div class="stat-sub">of ₹15L goal</div></div>
+      <div class="stat-card blue"><div class="stat-label">Volunteers Signed Up</div><div class="stat-value blue" id="vol-count">312</div><div class="stat-sub">+18 today</div></div>
+      <div class="stat-card amber"><div class="stat-label">Drop-off Points</div><div class="stat-value amber">6</div><div class="stat-sub">Across the district</div></div>
+      <div class="stat-card red"><div class="stat-label">Most Urgent Need</div><div class="stat-value red" style="font-size:18px;">Shelter Kits</div><div class="stat-sub">21% stock remaining</div></div>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <div class="section-label">Make a Donation</div>
+        <div class="amount-grid">
+          <button class="amount-btn" onclick="selectAmount(500, this)">₹500</button>
+          <button class="amount-btn active" onclick="selectAmount(1500, this)">₹1,500</button>
+          <button class="amount-btn" onclick="selectAmount(5000, this)">₹5,000</button>
+        </div>
+        <div class="custom-input-row">
+          <span>₹</span>
+          <input type="number" id="custom-amount" value="1500" min="100" oninput="updateImpact()">
+        </div>
+        <div class="impact-line" id="impact-line">
+          <span>Estimated impact</span>
+          <strong id="impact-text">≈ 15 food packets</strong>
+        </div>
+
+        <div class="section-label" style="margin-top:18px;">Where it goes</div>
+        <div class="alloc-row">
+          <div class="alloc-head"><span>Food &amp; water</span><span>40%</span></div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-teal" style="width:40%;"></div></div>
+        </div>
+        <div class="alloc-row">
+          <div class="alloc-head"><span>Medical supplies</span><span>25%</span></div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-red" style="width:25%;"></div></div>
+        </div>
+        <div class="alloc-row">
+          <div class="alloc-head"><span>Shelter kits</span><span>25%</span></div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-blue" style="width:25%;"></div></div>
+        </div>
+        <div class="alloc-row">
+          <div class="alloc-head"><span>Transport &amp; logistics</span><span>10%</span></div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-amber" style="width:10%;"></div></div>
+        </div>
+
+        <button class="donate-btn" onclick="confirmDonation()">Donate Now</button>
+        <div class="confirm-box" id="donate-confirm"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-label">Sign Up to Volunteer</div>
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input class="form-input" type="text" id="vol-name" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input class="form-input" type="tel" id="vol-phone" placeholder="+91 XXXXX XXXXX">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Location</label>
+          <select class="form-select" id="vol-location">
+            <option>Hoskote North</option>
+            <option>Kolar South</option>
+            <option>Devanahalli</option>
+            <option>Yelahanka</option>
+            <option>Base Camp (Flexible)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Skills / Availability</label>
+          <div class="skill-grid">
+            <div class="skill-chip" onclick="toggleSkill(this)">Driving</div>
+            <div class="skill-chip" onclick="toggleSkill(this)">First Aid</div>
+            <div class="skill-chip" onclick="toggleSkill(this)">Cooking</div>
+            <div class="skill-chip" onclick="toggleSkill(this)">Heavy Lifting</div>
+            <div class="skill-chip" onclick="toggleSkill(this)">Translation</div>
+            <div class="skill-chip" onclick="toggleSkill(this)">Coordination</div>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="confirmVolunteer()">Sign Up</button>
+        <div class="confirm-box" id="vol-confirm"></div>
+      </div>
+    </div>
+
+    <div class="section-label">Supply Drop-off Locations</div>
+    <div class="drop-grid">
+      <div class="drop-card"><div class="drop-name">St. Mary's Community Hall</div><div class="drop-addr">MG Road, Hoskote — open 7am to 9pm</div><span class="drop-need">Needs: Food, Water</span></div>
+      <div class="drop-card"><div class="drop-name">Govt. PU College Grounds</div><div class="drop-addr">Kolar South Highway Junction</div><span class="drop-need">Needs: Shelter Kits</span></div>
+      <div class="drop-card"><div class="drop-name">Rotary Club Warehouse</div><div class="drop-addr">Devanahalli Industrial Layout</div><span class="drop-need">Needs: Medical Supplies</span></div>
+      <div class="drop-card"><div class="drop-name">Yelahanka Fire Station</div><div class="drop-addr">Old Airport Road, Yelahanka</div><span class="drop-need">Needs: Blankets, Clothes</span></div>
+      <div class="drop-card"><div class="drop-name">Civil Guard Base Camp</div><div class="drop-addr">NH-44 Bypass, Bettahalasur</div><span class="drop-need">Needs: Volunteers, Fuel</span></div>
+      <div class="drop-card"><div class="drop-name">Hesarghatta Relief Center</div><div class="drop-addr">Near Lake Bund Road</div><span class="drop-need">Needs: Water Cans</span></div>
+    </div>
+
+    <div class="panel">
+      <div class="section-label" style="margin-bottom:8px;">Need Help Deciding?</div>
+      <button class="donate-btn" style="margin-top:0;" onclick="sendPrompt('Based on the current resource stock levels and most critical villages, what should a new donor or volunteer prioritize right now?')">Ask AI What's Needed Most ↗</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectAmount(val, btn) {
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('custom-amount').value = val;
+  updateImpact();
+}
+
+function updateImpact() {
+  const amt = parseFloat(document.getElementById('custom-amount').value) || 0;
+  const packets = Math.round(amt / 100);
+  document.getElementById('impact-text').textContent = `≈ ${packets} food packets`;
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+}
+
+function toggleSkill(el) {
+  el.classList.toggle('on');
+}
+
+function confirmDonation() {
+  const amt = parseFloat(document.getElementById('custom-amount').value) || 0;
+  const box = document.getElementById('donate-confirm');
+  box.textContent = `Thank you! Your ₹${amt.toLocaleString('en-IN')} donation has been recorded and will be allocated per the breakdown above.`;
+  box.classList.add('show');
+  const fundsEl = document.getElementById('funds-raised');
+  let current = parseFloat(fundsEl.textContent.replace('₹','').replace('L','')) * 100000;
+  current += amt;
+  fundsEl.textContent = '₹' + (current/100000).toFixed(1) + 'L';
+}
+
+function confirmVolunteer() {
+  const name = document.getElementById('vol-name').value.trim();
+  const box = document.getElementById('vol-confirm');
+  if (!name) {
+    box.textContent = 'Please enter your name to sign up.';
+    box.classList.add('show');
+    return;
+  }
+  const loc = document.getElementById('vol-location').value;
+  box.textContent = `Thanks, ${name}! You've been registered as a volunteer for ${loc}. Our coordination team will contact you shortly.`;
+  box.classList.add('show');
+  const countEl = document.getElementById('vol-count');
+  countEl.textContent = (parseInt(countEl.textContent) + 1).toString();
+}
+
+function sendPrompt(text) {
+  if (window.parent) { try { window.parent.postMessage({ type: 'sendPrompt', text }, '*'); } catch(e){} }
+  alert('AI Action: ' + text);
+}
+</script>
+</body>
+</html>

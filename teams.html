@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloodRelief Command — Relief Teams</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { margin:0; }
+  .dash { font-family: 'DM Sans', sans-serif; background: #0B1622; color: #E8EEF4; min-height: 100vh; }
+
+  .navbar { background: #0F1D2E; border-bottom: 1px solid #1E3A5A; padding: 0 24px; display: flex; gap: 4px; overflow-x: auto; }
+  .navbar a { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: #7A9BBC; text-decoration: none; padding: 12px 16px; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; letter-spacing: 0.5px; }
+  .navbar a:hover { color: #C5D8EC; }
+  .navbar a.active { color: #F59E0B; border-bottom-color: #F59E0B; }
+
+  .topbar { background: #0F1D2E; border-bottom: 1px solid #1E3A5A; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: #E8EEF4; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+  .brand-dot { width: 10px; height: 10px; border-radius: 50%; background: #F59E0B; animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+  .live-badge { background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; letter-spacing: 1px; text-transform: uppercase; animation: pulse 1.6s infinite; }
+  .topbar-right { display: flex; align-items: center; gap: 16px; font-size: 12px; color: #7A9BBC; }
+  .alert-ticker { background: #F59E0B; color: #0B1622; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 4px; }
+
+  .page-wrap { padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .page-sub { font-size: 12px; color: #5A8AB5; margin-bottom: 22px; }
+
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #4A7DAA; margin-bottom: 14px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat-card { background: #0F1D2E; border: 1px solid #1E3A5A; border-radius: 10px; padding: 14px 14px 12px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .stat-card.red::before { background: #EF4444; }
+  .stat-card.amber::before { background: #F59E0B; }
+  .stat-card.teal::before { background: #14B8A6; }
+  .stat-card.blue::before { background: #3B82F6; }
+  .stat-label { font-size: 10px; color: #5A8AB5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 26px; font-weight: 700; color: #E8EEF4; line-height: 1; margin-bottom: 4px; }
+  .stat-value.red { color: #EF4444; }
+  .stat-value.amber { color: #F59E0B; }
+  .stat-value.teal { color: #14B8A6; }
+  .stat-value.blue { color: #3B82F6; }
+  .stat-sub { font-size: 10px; color: #4A7DAA; }
+
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; margin-bottom: 28px; }
+
+  .team-card-full { background: #0F1D2E; border: 1px solid #1E3A5A; border-radius: 12px; padding: 18px; transition: border-color 0.15s, transform 0.15s; }
+  .team-card-full:hover { border-color: #2A4D6E; transform: translateY(-2px); }
+
+  .team-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .team-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; font-family: 'Space Grotesk', sans-serif; }
+  .team-name-lg { font-size: 14px; font-weight: 600; color: #E8EEF4; margin-bottom: 2px; }
+  .team-loc { font-size: 11px; color: #5A8AB5; }
+
+  .team-badge { font-size: 10px; padding: 3px 9px; border-radius: 5px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-left: auto; }
+  .badge-active { background: rgba(20,184,166,0.2); color: #2DD4BF; }
+  .badge-transit { background: rgba(245,158,11,0.2); color: #FCD34D; }
+  .badge-base { background: rgba(59,130,246,0.15); color: #60A5FA; }
+
+  .team-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .team-meta-item { background: #0B1622; border: 1px solid #1A2F46; border-radius: 8px; padding: 8px 10px; }
+  .team-meta-label { font-size: 9px; color: #4A7DAA; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 3px; }
+  .team-meta-value { font-size: 13px; color: #C5D8EC; font-weight: 600; font-family: 'Space Grotesk', sans-serif; }
+
+  .team-progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #A0BECF; margin-bottom: 6px; }
+  .r-bar-track { height: 7px; background: #1A2F46; border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
+  .r-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+  .fill-teal { background: #14B8A6; }
+  .fill-amber { background: #F59E0B; }
+  .fill-blue { background: #3B82F6; }
+
+  .team-actions { display: flex; gap: 8px; }
+  .team-btn { flex: 1; background: #1A2F46; border: 1px solid #2A4D6E; color: #C5D8EC; border-radius: 7px; padding: 9px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; font-family: 'DM Sans', sans-serif; }
+  .team-btn:hover { background: #234060; }
+  .team-btn.primary { background: #14B8A6; color: #0B1622; border-color: #14B8A6; }
+  .team-btn.primary:hover { background: #2DD4BF; }
+
+  /* Communications log */
+  .comm-panel { background: #0F1D2E; border: 1px solid #1E3A5A; border-radius: 12px; padding: 18px; }
+  .comm-list { display: flex; flex-direction: column; gap: 10px; max-height: 360px; overflow-y: auto; }
+  .comm-item { display: flex; gap: 10px; padding: 10px 12px; background: #0B1622; border: 1px solid #1A2F46; border-radius: 8px; }
+  .comm-avatar { width: 28px; height: 28px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size: 10px; font-weight: 700; flex-shrink:0; font-family: 'Space Grotesk', sans-serif; }
+  .comm-body { flex: 1; }
+  .comm-head { display: flex; justify-content: space-between; margin-bottom: 2px; }
+  .comm-name { font-size: 12px; font-weight: 600; color: #C5D8EC; }
+  .comm-time { font-size: 10px; color: #4A7DAA; }
+  .comm-msg { font-size: 12px; color: #A0BECF; line-height: 1.4; }
+
+  .send-row { display: flex; gap: 8px; margin-top: 14px; }
+  .send-input { flex: 1; background: #0B1622; border: 1px solid #1E3A5A; border-radius: 8px; padding: 10px 12px; color: #E8EEF4; font-size: 12px; font-family: 'DM Sans', sans-serif; }
+  .send-input:focus { outline: none; border-color: #F59E0B; }
+  .send-btn { background: #F59E0B; color: #0B1622; border: none; border-radius: 8px; padding: 10px 16px; font-weight: 700; font-size: 12px; cursor: pointer; font-family: 'Space Grotesk', sans-serif; }
+  .send-btn:hover { background: #FBBF24; }
+
+  .two-col { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } .team-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: repeat(2,1fr); } }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <a href="index.html">Dashboard</a>
+  <a href="teams.html" class="active">Relief Teams</a>
+  <a href="analytics.html">Analytics &amp; Reports</a>
+  <a href="volunteers.html">Volunteer &amp; Donate</a>
+</nav>
+<div class="dash">
+  <div class="topbar">
+    <div class="brand"><div class="brand-dot"></div> FloodRelief Command</div>
+    <div class="topbar-right">
+      <span class="alert-ticker">⚠ ACTIVE DISASTER</span>
+      <span>District: Kaveri Rural | Day 3</span>
+      <span class="live-badge">LIVE</span>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-title">Relief Team Operations</div>
+    <div class="page-sub">Live status, deployment tracking, and communication channel with all field units.</div>
+
+    <div class="stats-row">
+      <div class="stat-card blue"><div class="stat-label">Teams Active</div><div class="stat-value blue">7</div><div class="stat-sub">4 partner organizations</div></div>
+      <div class="stat-card teal"><div class="stat-label">Villages Reached Today</div><div class="stat-value teal">14</div><div class="stat-sub">of 21 total villages</div></div>
+      <div class="stat-card amber"><div class="stat-label">In Transit</div><div class="stat-value amber">2</div><div class="stat-sub">ETA under 45 min</div></div>
+      <div class="stat-card red"><div class="stat-label">On Standby</div><div class="stat-value red">1</div><div class="stat-sub">Awaiting deployment order</div></div>
+    </div>
+
+    <div class="section-label">All Teams</div>
+    <div class="team-grid">
+
+      <div class="team-card-full">
+        <div class="team-card-head">
+          <div class="team-avatar" style="background:rgba(20,184,166,0.2);color:#2DD4BF;">RC</div>
+          <div>
+            <div class="team-name-lg">Red Cross — Team A</div>
+            <div class="team-loc">Hoskote North · 3 volunteers</div>
+          </div>
+          <span class="team-badge badge-active">Active</span>
+        </div>
+        <div class="team-meta">
+          <div class="team-meta-item"><div class="team-meta-label">Vehicle</div><div class="team-meta-value">Truck RC-04</div></div>
+          <div class="team-meta-item"><div class="team-meta-label">Cargo</div><div class="team-meta-value">Food + Medical</div></div>
+        </div>
+        <div class="team-progress-label"><span>Today's coverage target</span><span>3 / 4 villages</span></div>
+        <div class="r-bar-track"><div class="r-bar-fill fill-teal" style="width:75%;"></div></div>
+        <div class="team-actions">
+          <button class="team-btn primary" onclick="sendPrompt('Give Red Cross Team A their next priority village to visit based on the Flooded Village dashboard data')">Next Assignment ↗</button>
+          <button class="team-btn" onclick="alert('Opening live location for Team A...')">View Location</button>
+        </div>
+      </div>
+
+      <div class="team-card-full">
+        <div class="team-card-head">
+          <div class="team-avatar" style="background:rgba(245,158,11,0.2);color:#FCD34D;">ND</div>
+          <div>
+            <div class="team-name-lg">NDRF — Team B</div>
+            <div class="team-loc">En route to Kolar South</div>
+          </div>
+          <span class="team-badge badge-transit">In Transit</span>
+        </div>
+        <div class="team-meta">
+          <div class="team-meta-item"><div class="team-meta-label">ETA</div><div class="team-meta-value">22 min</div></div>
+          <div class="team-meta-item"><div class="team-meta-label">Cargo</div><div class="team-meta-value">Medical Unit</div></div>
+        </div>
+        <div class="team-progress-label"><span>Today's coverage target</span><span>1 / 3 villages</span></div>
+        <div class="r-bar-track"><div class="r-bar-fill fill-amber" style="width:33%;"></div></div>
+        <div class="team-actions">
+          <button class="team-btn primary" onclick="sendPrompt('What should NDRF Team B prioritize once they arrive at Kolar South, based on the dashboard alerts?')">Brief on Arrival ↗</button>
+          <button class="team-btn" onclick="alert('Opening live location for Team B...')">View Location</button>
+        </div>
+      </div>
+
+      <div class="team-card-full">
+        <div class="team-card-head">
+          <div class="team-avatar" style="background:rgba(59,130,246,0.15);color:#60A5FA;">CG</div>
+          <div>
+            <div class="team-name-lg">Civil Guard — Team C</div>
+            <div class="team-loc">Base camp · Awaiting orders</div>
+          </div>
+          <span class="team-badge badge-base">Standby</span>
+        </div>
+        <div class="team-meta">
+          <div class="team-meta-item"><div class="team-meta-label">Vehicle</div><div class="team-meta-value">Van CG-11</div></div>
+          <div class="team-meta-item"><div class="team-meta-label">Crew</div><div class="team-meta-value">5 volunteers</div></div>
+        </div>
+        <div class="team-progress-label"><span>Today's coverage target</span><span>0 / 3 villages</span></div>
+        <div class="r-bar-track"><div class="r-bar-fill fill-blue" style="width:0%;"></div></div>
+        <div class="team-actions">
+          <button class="team-btn primary" onclick="sendPrompt('Generate a priority deployment order for Team C based on the most critical unserved villages in the Flooded Village dashboard')">Deploy via AI ↗</button>
+          <button class="team-btn" onclick="alert('Opening live location for Team C...')">View Location</button>
+        </div>
+      </div>
+
+      <div class="team-card-full">
+        <div class="team-card-head">
+          <div class="team-avatar" style="background:rgba(239,68,68,0.2);color:#F87171;">MF</div>
+          <div>
+            <div class="team-name-lg">MedFirst — Unit D</div>
+            <div class="team-loc">Deployed at Venkatapur</div>
+          </div>
+          <span class="team-badge badge-active">Active</span>
+        </div>
+        <div class="team-meta">
+          <div class="team-meta-item"><div class="team-meta-label">Vehicle</div><div class="team-meta-value">Ambulance MF-2</div></div>
+          <div class="team-meta-item"><div class="team-meta-label">Cargo</div><div class="team-meta-value">Medical Supplies</div></div>
+        </div>
+        <div class="team-progress-label"><span>Today's coverage target</span><span>2 / 2 villages</span></div>
+        <div class="r-bar-track"><div class="r-bar-fill fill-teal" style="width:100%;"></div></div>
+        <div class="team-actions">
+          <button class="team-btn primary" onclick="sendPrompt('Unit D has completed its targets. Suggest the next best village for MedFirst Unit D to support.')">Reassign via AI ↗</button>
+          <button class="team-btn" onclick="alert('Opening live location for Unit D...')">View Location</button>
+        </div>
+      </div>
+
+      <div class="team-card-full">
+        <div class="team-card-head">
+          <div class="team-avatar" style="background:rgba(139,92,246,0.2);color:#A78BFA;">SV</div>
+          <div>
+            <div class="team-name-lg">Seva Volunteers — Team E</div>
+            <div class="team-loc">Deployed at Yelahanka</div>
+          </div>
+          <span class="team-badge badge-active">Active</span>
+        </div>
+        <div class="team-meta">
+          <div class="team-meta-item"><div class="team-meta-label">Vehicle</div><div class="team-meta-value">Truck SV-01</div></div>
+          <div class="team-meta-item"><div class="team-meta-label">Cargo</div><div class="team-meta-value">Food + Water</div></div>
+        </div>
+        <div class="team-progress-label"><span>Today's coverage target</span><span>2 / 2 villages</span></div>
+        <div class="r-bar-track"><div class="r-bar-fill fill-teal" style="width:100%;"></div></div>
+        <div class="team-actions">
+          <button class="team-btn primary" onclick="sendPrompt('Team E has finished. Where should Seva Volunteers Team E go next?')">Reassign via AI ↗</button>
+          <button class="team-btn" onclick="alert('Opening live location for Team E...')">View Location</button>
+        </div>
+      </div>
+
+      <div class="team-card-full">
+        <div class="team-card-head">
+          <div class="team-avatar" style="background:rgba(20,184,166,0.2);color:#2DD4BF;">RC</div>
+          <div>
+            <div class="team-name-lg">Red Cross — Team F</div>
+            <div class="team-loc">En route to Devanahalli</div>
+          </div>
+          <span class="team-badge badge-transit">In Transit</span>
+        </div>
+        <div class="team-meta">
+          <div class="team-meta-item"><div class="team-meta-label">ETA</div><div class="team-meta-value">38 min</div></div>
+          <div class="team-meta-item"><div class="team-meta-label">Cargo</div><div class="team-meta-value">Shelter Kits</div></div>
+        </div>
+        <div class="team-progress-label"><span>Today's coverage target</span><span>0 / 2 villages</span></div>
+        <div class="r-bar-track"><div class="r-bar-fill fill-amber" style="width:0%;"></div></div>
+        <div class="team-actions">
+          <button class="team-btn primary" onclick="sendPrompt('Brief Red Cross Team F on what they will find at Devanahalli based on the dashboard data')">Brief on Arrival ↗</button>
+          <button class="team-btn" onclick="alert('Opening live location for Team F...')">View Location</button>
+        </div>
+      </div>
+
+      <div class="team-card-full">
+        <div class="team-card-head">
+          <div class="team-avatar" style="background:rgba(59,130,246,0.15);color:#60A5FA;">CG</div>
+          <div>
+            <div class="team-name-lg">Civil Guard — Team G</div>
+            <div class="team-loc">Deployed at Hesarghatta</div>
+          </div>
+          <span class="team-badge badge-active">Active</span>
+        </div>
+        <div class="team-meta">
+          <div class="team-meta-item"><div class="team-meta-label">Vehicle</div><div class="team-meta-value">Van CG-07</div></div>
+          <div class="team-meta-item"><div class="team-meta-label">Cargo</div><div class="team-meta-value">Water Cans</div></div>
+        </div>
+        <div class="team-progress-label"><span>Today's coverage target</span><span>1 / 2 villages</span></div>
+        <div class="r-bar-track"><div class="r-bar-fill fill-blue" style="width:50%;"></div></div>
+        <div class="team-actions">
+          <button class="team-btn primary" onclick="sendPrompt('What should Civil Guard Team G do after finishing Hesarghatta?')">Next Assignment ↗</button>
+          <button class="team-btn" onclick="alert('Opening live location for Team G...')">View Location</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="two-col">
+      <div class="comm-panel">
+        <div class="section-label">Field Communications Log</div>
+        <div class="comm-list" id="comm-list">
+          <div class="comm-item">
+            <div class="comm-avatar" style="background:rgba(239,68,68,0.2);color:#F87171;">MF</div>
+            <div class="comm-body">
+              <div class="comm-head"><span class="comm-name">MedFirst — Unit D</span><span class="comm-time">2m ago</span></div>
+              <div class="comm-msg">Venkatapur fully covered. Two patients stabilized, moving to Hesarghatta next if cleared.</div>
+            </div>
+          </div>
+          <div class="comm-item">
+            <div class="comm-avatar" style="background:rgba(245,158,11,0.2);color:#FCD34D;">ND</div>
+            <div class="comm-body">
+              <div class="comm-head"><span class="comm-name">NDRF — Team B</span><span class="comm-time">6m ago</span></div>
+              <div class="comm-msg">Road to Kolar South partially submerged, rerouting via Hoskote bridge. ETA revised to 22 min.</div>
+            </div>
+          </div>
+          <div class="comm-item">
+            <div class="comm-avatar" style="background:rgba(20,184,166,0.2);color:#2DD4BF;">RC</div>
+            <div class="comm-body">
+              <div class="comm-head"><span class="comm-name">Red Cross — Team A</span><span class="comm-time">14m ago</span></div>
+              <div class="comm-msg">Hoskote North coverage at 75%. Requesting one more food crate for the eastern hamlet.</div>
+            </div>
+          </div>
+          <div class="comm-item">
+            <div class="comm-avatar" style="background:rgba(139,92,246,0.2);color:#A78BFA;">SV</div>
+            <div class="comm-body">
+              <div class="comm-head"><span class="comm-name">Seva Volunteers — Team E</span><span class="comm-time">28m ago</span></div>
+              <div class="comm-msg">Yelahanka distribution complete, 680 families served. Awaiting next assignment.</div>
+            </div>
+          </div>
+          <div class="comm-item">
+            <div class="comm-avatar" style="background:rgba(59,130,246,0.15);color:#60A5FA;">CG</div>
+            <div class="comm-body">
+              <div class="comm-head"><span class="comm-name">Civil Guard — Team C</span><span class="comm-time">40m ago</span></div>
+              <div class="comm-msg">Standing by at base camp, vehicle fueled and loaded. Ready for immediate dispatch.</div>
+            </div>
+          </div>
+        </div>
+        <div class="send-row">
+          <input class="send-input" id="comm-input" type="text" placeholder="Broadcast a message to all field teams...">
+          <button class="send-btn" onclick="sendComm()">Send</button>
+        </div>
+      </div>
+
+      <div class="comm-panel">
+        <div class="section-label">Quick AI Actions</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <button class="team-btn primary" style="width:100%;" onclick="sendPrompt('Summarize the current status of all relief teams and flag any team that is underutilized')">Summarize Team Status ↗</button>
+          <button class="team-btn primary" style="width:100%;" onclick="sendPrompt('Re-balance the relief team assignments across all villages to minimize duplicate deliveries and cover all critical villages first')">Re-balance Assignments ↗</button>
+          <button class="team-btn primary" style="width:100%;" onclick="sendPrompt('Draft a radio message to send to all field teams about the rising water levels near Hoskote bridge')">Draft Broadcast Message ↗</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function sendComm() {
+  const input = document.getElementById('comm-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const list = document.getElementById('comm-list');
+  const item = document.createElement('div');
+  item.className = 'comm-item';
+  item.innerHTML = `
+    <div class="comm-avatar" style="background:rgba(245,158,11,0.2);color:#FCD34D;">HQ</div>
+    <div class="comm-body">
+      <div class="comm-head"><span class="comm-name">Command HQ (You)</span><span class="comm-time">just now</span></div>
+      <div class="comm-msg">${text}</div>
+    </div>
+  `;
+  list.prepend(item);
+  input.value = '';
+}
+function sendPrompt(text) {
+  if (window.parent) { try { window.parent.postMessage({ type: 'sendPrompt', text }, '*'); } catch(e){} }
+  alert('AI Action: ' + text);
+}
+</script>
+</body>
+</html>

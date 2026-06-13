@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FloodRelief Command — Dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+  .navbar {
+    background: #0F1D2E;
+    border-bottom: 1px solid #1E3A5A;
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .navbar a {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7A9BBC;
+    text-decoration: none;
+    padding: 12px 16px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .navbar a:hover { color: #C5D8EC; }
+  .navbar a.active { color: #F59E0B; border-bottom-color: #F59E0B; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .dash {
+    font-family: 'DM Sans', sans-serif;
+    background: #0B1622;
+    color: #E8EEF4;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .topbar {
+    background: #0F1D2E;
+    border-bottom: 1px solid #1E3A5A;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #E8EEF4;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #F59E0B;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  .live-badge {
+    background: #EF4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: pulse 1.6s infinite;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: #7A9BBC;
+  }
+
+  .alert-ticker {
+    background: #F59E0B;
+    color: #0B1622;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+  }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    padding: 0;
+  }
+
+  .left-panel {
+    grid-column: 1 / 3;
+    padding: 20px 20px 20px 24px;
+    border-right: 1px solid #1E3A5A;
+  }
+
+  .right-panel {
+    padding: 20px 24px 20px 20px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4A7DAA;
+    margin-bottom: 14px;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .stat-card {
+    background: #0F1D2E;
+    border: 1px solid #1E3A5A;
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .stat-card.red::before { background: #EF4444; }
+  .stat-card.amber::before { background: #F59E0B; }
+  .stat-card.teal::before { background: #14B8A6; }
+  .stat-card.blue::before { background: #3B82F6; }
+
+  .stat-label {
+    font-size: 10px;
+    color: #5A8AB5;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #E8EEF4;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-sub {
+    font-size: 10px;
+    color: #4A7DAA;
+  }
+
+  .stat-value.red { color: #EF4444; }
+  .stat-value.amber { color: #F59E0B; }
+  .stat-value.teal { color: #14B8A6; }
+  .stat-value.blue { color: #3B82F6; }
+
+  .map-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .map-legend {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: #7A9BBC;
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+
+  .village-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 7px;
+    margin-bottom: 20px;
+  }
+
+  .v-cell {
+    border-radius: 8px;
+    padding: 10px 6px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+    border: 1px solid transparent;
+    position: relative;
+  }
+
+  .v-cell:hover {
+    transform: scale(1.06);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  .v-cell.critical {
+    background: rgba(239,68,68,0.18);
+    border-color: rgba(239,68,68,0.35);
+    animation: cell-pulse 2s ease-in-out infinite;
+  }
+
+  .v-cell.partial {
+    background: rgba(245,158,11,0.15);
+    border-color: rgba(245,158,11,0.3);
+  }
+
+  .v-cell.covered {
+    background: rgba(20,184,166,0.13);
+    border-color: rgba(20,184,166,0.28);
+  }
+
+  .v-cell.duplicate {
+    background: rgba(139,92,246,0.15);
+    border-color: rgba(139,92,246,0.3);
+  }
+
+  @keyframes cell-pulse {
+    0%, 100% { background: rgba(239,68,68,0.18); }
+    50% { background: rgba(239,68,68,0.32); }
+  }
+
+  .v-name {
+    font-size: 10px;
+    font-weight: 500;
+    color: #C5D8EC;
+    line-height: 1.3;
+    margin-bottom: 5px;
+  }
+
+  .v-pop {
+    font-size: 9px;
+    color: #5A8AB5;
+    margin-bottom: 6px;
+  }
+
+  .v-icons {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+    font-size: 10px;
+  }
+
+  .icon-pill {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+  }
+
+  .icon-pill.food { background: rgba(20,184,166,0.25); color: #2DD4BF; }
+  .icon-pill.med { background: rgba(239,68,68,0.25); color: #F87171; }
+  .icon-pill.shelter { background: rgba(59,130,246,0.25); color: #60A5FA; }
+  .icon-pill.none { background: rgba(255,255,255,0.05); color: #334E68; }
+
+  .resource-bars {
+    margin-bottom: 20px;
+  }
+
+  .r-bar-row {
+    margin-bottom: 14px;
+  }
+
+  .r-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .r-bar-label {
+    font-size: 12px;
+    color: #A0BECF;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .r-bar-pct {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #C5D8EC;
+  }
+
+  .r-bar-track {
+    height: 7px;
+    background: #1A2F46;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .r-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+
+  .fill-teal { background: #14B8A6; }
+  .fill-red { background: #EF4444; }
+  .fill-blue { background: #3B82F6; }
+  .fill-amber { background: #F59E0B; }
+
+  .alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .alert-item {
+    background: #0F1D2E;
+    border: 1px solid #1E3A5A;
+    border-left: 3px solid #EF4444;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .alert-item.warn { border-left-color: #F59E0B; }
+  .alert-item.info { border-left-color: #3B82F6; }
+  .alert-item.ok { border-left-color: #14B8A6; }
+
+  .alert-content { flex: 1; }
+
+  .alert-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #D0E4F0;
+    margin-bottom: 2px;
+  }
+
+  .alert-desc {
+    font-size: 11px;
+    color: #5A8AB5;
+    line-height: 1.4;
+  }
+
+  .alert-time {
+    font-size: 10px;
+    color: #4A7DAA;
+    white-space: nowrap;
+    margin-top: 1px;
+  }
+
+  .team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .team-card {
+    background: #0F1D2E;
+    border: 1px solid #1E3A5A;
+    border-radius: 9px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .team-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .team-info { flex: 1; }
+
+  .team-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #C5D8EC;
+    margin-bottom: 1px;
+  }
+
+  .team-status-text {
+    font-size: 10px;
+    color: #5A8AB5;
+  }
+
+  .team-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .badge-active { background: rgba(20,184,166,0.2); color: #2DD4BF; }
+  .badge-transit { background: rgba(245,158,11,0.2); color: #FCD34D; }
+  .badge-base { background: rgba(59,130,246,0.15); color: #60A5FA; }
+
+  .deploy-btn {
+    width: 100%;
+    background: #F59E0B;
+    color: #0B1622;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 14px;
+    letter-spacing: 0.5px;
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .deploy-btn:hover { background: #FBBF24; transform: translateY(-1px); }
+  .deploy-btn:active { transform: scale(0.98); }
+
+  .filter-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid #1E3A5A;
+    background: transparent;
+    color: #7A9BBC;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: #1E3A5A;
+    color: #C5D8EC;
+  }
+
+  .filter-btn.f-red.active { background: rgba(239,68,68,0.2); border-color: #EF4444; color: #F87171; }
+  .filter-btn.f-amber.active { background: rgba(245,158,11,0.2); border-color: #F59E0B; color: #FCD34D; }
+  .filter-btn.f-teal.active { background: rgba(20,184,166,0.2); border-color: #14B8A6; color: #2DD4BF; }
+  .filter-btn.f-purple.active { background: rgba(139,92,246,0.2); border-color: #8B5CF6; color: #A78BFA; }
+
+  .bottom-bar {
+    background: #0F1D2E;
+    border-top: 1px solid #1E3A5A;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #4A7DAA;
+  }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #14B8A6;
+    animation: pulse 2s infinite;
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: #0F1D2E;
+    border: 1px solid #2A4D6E;
+    border-radius: 14px;
+    padding: 24px;
+    width: 320px;
+    position: relative;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .modal-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #E8EEF4;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: #5A8AB5;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: #E8EEF4; }
+
+  .resource-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .res-tog {
+    background: #1A2F46;
+    border: 1px solid #2A4D6E;
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .res-tog.on { background: rgba(20,184,166,0.2); border-color: #14B8A6; }
+  .res-tog.on .res-tog-label { color: #2DD4BF; }
+
+  .res-tog-icon { font-size: 18px; margin-bottom: 4px; }
+  .res-tog-label { font-size: 11px; color: #7A9BBC; font-weight: 500; }
+
+  .assign-btn {
+    width: 100%;
+    background: #14B8A6;
+    color: #0B1622;
+    border: none;
+    border-radius: 8px;
+    padding: 11px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .assign-btn:hover { background: #2DD4BF; }
+
+  .village-detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #7A9BBC;
+    padding: 5px 0;
+    border-bottom: 1px solid #1A2F46;
+  }
+
+  .village-detail-row span:last-child { color: #C5D8EC; font-weight: 500; }
+</style>
+</head>
+<body style="margin:0;">
+<nav class="navbar">
+  <a href="index.html" class="active">Dashboard</a>
+  <a href="teams.html">Relief Teams</a>
+  <a href="analytics.html">Analytics &amp; Reports</a>
+  <a href="volunteers.html">Volunteer &amp; Donate</a>
+</nav>
+<div class="dash" id="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-dot"></div>
+      FloodRelief Command
+    </div>
+    <div class="topbar-right">
+      <span class="alert-ticker">⚠ ACTIVE DISASTER</span>
+      <span>District: Kaveri Rural | Day 3</span>
+      <span class="live-badge">LIVE</span>
+    </div>
+  </div>
+
+  <div class="stats-row" style="padding: 18px 24px 0; background: #0B1622;">
+    <div class="stat-card red">
+      <div class="stat-label">Displaced Families</div>
+      <div class="stat-value red" id="displaced">4,820</div>
+      <div class="stat-sub">↑ 312 since 6 hrs ago</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-label">Villages Unserved</div>
+      <div class="stat-value amber" id="unserved">9</div>
+      <div class="stat-sub">Critical — no aid delivered</div>
+    </div>
+    <div class="stat-card teal">
+      <div class="stat-label">Resources Deployed</div>
+      <div class="stat-value teal">63%</div>
+      <div class="stat-sub">Of total stockpile</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Relief Teams Active</div>
+      <div class="stat-value blue">7</div>
+      <div class="stat-sub">4 orgs coordinating</div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="left-panel">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+        <div class="section-label" style="margin-bottom: 0;">Village Coverage Map</div>
+        <div class="map-legend">
+          <span><span class="legend-dot" style="background:#EF4444;"></span>Critical</span>
+          <span><span class="legend-dot" style="background:#F59E0B;"></span>Partial</span>
+          <span><span class="legend-dot" style="background:#14B8A6;"></span>Covered</span>
+          <span><span class="legend-dot" style="background:#8B5CF6;"></span>Duplicate</span>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterVillages('all', this)">All</button>
+        <button class="filter-btn f-red" onclick="filterVillages('critical', this)">Critical</button>
+        <button class="filter-btn f-amber" onclick="filterVillages('partial', this)">Partial Aid</button>
+        <button class="filter-btn f-teal" onclick="filterVillages('covered', this)">Covered</button>
+        <button class="filter-btn f-purple" onclick="filterVillages('duplicate', this)">Duplicate</button>
+      </div>
+
+      <div class="village-grid" id="village-grid"></div>
+
+      <div class="section-label" style="margin-top:4px;">Resource Stock Levels</div>
+      <div class="resource-bars" id="resource-bars">
+        <div class="r-bar-row">
+          <div class="r-bar-header">
+            <span class="r-bar-label"><i class="ti ti-package" aria-hidden="true" style="font-size:14px;"></i> Food Packets</span>
+            <span class="r-bar-pct">38%</span>
+          </div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-teal" style="width:38%;"></div></div>
+        </div>
+        <div class="r-bar-row">
+          <div class="r-bar-header">
+            <span class="r-bar-label"><i class="ti ti-first-aid-kit" aria-hidden="true" style="font-size:14px;"></i> Medical Supplies</span>
+            <span class="r-bar-pct">54%</span>
+          </div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-red" style="width:54%;"></div></div>
+        </div>
+        <div class="r-bar-row">
+          <div class="r-bar-header">
+            <span class="r-bar-label"><i class="ti ti-home" aria-hidden="true" style="font-size:14px;"></i> Temporary Shelters</span>
+            <span class="r-bar-pct">21%</span>
+          </div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-blue" style="width:21%;"></div></div>
+        </div>
+        <div class="r-bar-row">
+          <div class="r-bar-header">
+            <span class="r-bar-label"><i class="ti ti-droplet" aria-hidden="true" style="font-size:14px;"></i> Clean Water Cans</span>
+            <span class="r-bar-pct">67%</span>
+          </div>
+          <div class="r-bar-track"><div class="r-bar-fill fill-amber" style="width:67%;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="section-label">Live Alerts</div>
+      <div class="alerts-list">
+        <div class="alert-item">
+          <div class="alert-content">
+            <div class="alert-title">Kolar South — Zero aid, 480 displaced</div>
+            <div class="alert-desc">3rd consecutive day with no supply delivery. Medical emergency likely.</div>
+          </div>
+          <div class="alert-time">4m ago</div>
+        </div>
+        <div class="alert-item warn">
+          <div class="alert-content">
+            <div class="alert-title">Nandini Block — Duplicate food drop</div>
+            <div class="alert-desc">2 orgs sent food independently. Redirect Team C to uncovered zones.</div>
+          </div>
+          <div class="alert-time">11m ago</div>
+        </div>
+        <div class="alert-item info">
+          <div class="alert-content">
+            <div class="alert-title">Water rising — Bridge at Hoskote</div>
+            <div class="alert-desc">Road access to East cluster may be cut within 6 hours.</div>
+          </div>
+          <div class="alert-time">23m ago</div>
+        </div>
+        <div class="alert-item ok">
+          <div class="alert-content">
+            <div class="alert-title">Chikka Village — Coverage complete</div>
+            <div class="alert-desc">Food, medicine, and shelter confirmed delivered. 210 families.</div>
+          </div>
+          <div class="alert-time">41m ago</div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:4px;">Relief Teams</div>
+      <div class="team-list">
+        <div class="team-card">
+          <div class="team-avatar" style="background:rgba(20,184,166,0.2);color:#2DD4BF;">RC</div>
+          <div class="team-info">
+            <div class="team-name">Red Cross — Team A</div>
+            <div class="team-status-text">At Hoskote North · 3 volunteers</div>
+          </div>
+          <span class="team-badge badge-active">Active</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:rgba(245,158,11,0.2);color:#FCD34D;">ND</div>
+          <div class="team-info">
+            <div class="team-name">NDRF — Team B</div>
+            <div class="team-status-text">En route to Kolar South</div>
+          </div>
+          <span class="team-badge badge-transit">In Transit</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:rgba(59,130,246,0.15);color:#60A5FA;">CG</div>
+          <div class="team-info">
+            <div class="team-name">Civil Guard — Team C</div>
+            <div class="team-status-text">Base camp · Awaiting orders</div>
+          </div>
+          <span class="team-badge badge-base">Standby</span>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar" style="background:rgba(239,68,68,0.2);color:#F87171;">MF</div>
+          <div class="team-info">
+            <div class="team-name">MedFirst — Unit D</div>
+            <div class="team-status-text">Deployed at Venkatapur</div>
+          </div>
+          <span class="team-badge badge-active">Active</span>
+        </div>
+      </div>
+
+      <button class="deploy-btn" onclick="sendPrompt('Generate a priority deployment order for Team C based on the most critical unserved villages in the Flooded Village dashboard')">
+        <i class="ti ti-send" aria-hidden="true" style="font-size:14px; vertical-align:-2px; margin-right:6px;"></i>
+        Deploy Team C via AI ↗
+      </button>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      System online · Last synced 2 min ago
+    </div>
+    <span>PROMPT WARS 2026 · Sapthagiri NPS University · Scenario 1: The Flooded Village</span>
+    <span>Coord: 12.9716°N, 77.5946°E</span>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-village-name">Village Name</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-details"></div>
+    <div style="margin: 14px 0 10px; font-size: 11px; font-weight: 700; color: #4A7DAA; letter-spacing: 1.5px; text-transform: uppercase;">Assign Resources</div>
+    <div class="resource-toggle">
+      <div class="res-tog" id="rt-food" onclick="toggleRes('food')">
+        <div class="res-tog-icon"><i class="ti ti-package" style="font-size:18px;color:#2DD4BF;" aria-hidden="true"></i></div>
+        <div class="res-tog-label">Food</div>
+      </div>
+      <div class="res-tog" id="rt-med" onclick="toggleRes('med')">
+        <div class="res-tog-icon"><i class="ti ti-first-aid-kit" style="font-size:18px;color:#F87171;" aria-hidden="true"></i></div>
+        <div class="res-tog-label">Medical</div>
+      </div>
+      <div class="res-tog" id="rt-shelter" onclick="toggleRes('shelter')">
+        <div class="res-tog-icon"><i class="ti ti-home" style="font-size:18px;color:#60A5FA;" aria-hidden="true"></i></div>
+        <div class="res-tog-label">Shelter</div>
+      </div>
+    </div>
+    <button class="assign-btn" onclick="assignResources()">Confirm Assignment</button>
+  </div>
+</div>
+
+<script>
+const villages = [
+  { name: "Kolar South", pop: 480, status: "critical", food: false, med: false, shelter: false },
+  { name: "Devara Gudda", pop: 310, status: "critical", food: false, med: false, shelter: false },
+  { name: "Manchalli", pop: 225, status: "partial", food: true, med: false, shelter: false },
+  { name: "Nandini Block", pop: 390, status: "duplicate", food: true, med: true, shelter: false },
+  { name: "Hoskote North", pop: 280, status: "covered", food: true, med: true, shelter: true },
+  { name: "Venkatapur", pop: 190, status: "covered", food: true, med: true, shelter: true },
+  { name: "Avathi", pop: 140, status: "partial", food: false, med: false, shelter: true },
+  { name: "Chikka Village", pop: 210, status: "covered", food: true, med: true, shelter: true },
+  { name: "Devanahalli", pop: 520, status: "critical", food: false, med: false, shelter: false },
+  { name: "Sadahalli", pop: 175, status: "partial", food: true, med: false, shelter: false },
+  { name: "Yelahanka", pop: 680, status: "covered", food: true, med: true, shelter: true },
+  { name: "Kodigehalli", pop: 295, status: "duplicate", food: true, med: false, shelter: false },
+  { name: "Bettahalasur", pop: 160, status: "partial", food: false, med: true, shelter: false },
+  { name: "Jala North", pop: 245, status: "critical", food: false, med: false, shelter: false },
+  { name: "Rajanukunte", pop: 330, status: "covered", food: true, med: true, shelter: true },
+  { name: "Doddaballapur", pop: 410, status: "partial", food: true, med: false, shelter: false },
+  { name: "Makali East", pop: 185, status: "critical", food: false, med: false, shelter: false },
+  { name: "Hesarghatta", pop: 270, status: "covered", food: true, med: true, shelter: true },
+  { name: "Solur", pop: 155, status: "partial", food: false, med: true, shelter: false },
+  { name: "Bidadi", pop: 365, status: "duplicate", food: true, med: true, shelter: false },
+  { name: "Kengeri", pop: 440, status: "critical", food: false, med: false, shelter: false },
+];
+
+let activeFilter = 'all';
+let selectedVillage = null;
+let resState = { food: false, med: false, shelter: false };
+
+function renderGrid(filter) {
+  const grid = document.getElementById('village-grid');
+  grid.innerHTML = '';
+  villages.forEach((v, i) => {
+    if (filter !== 'all' && v.status !== filter) return;
+    const cell = document.createElement('div');
+    cell.className = `v-cell ${v.status}`;
+    cell.onclick = () => openModal(i);
+    cell.title = v.name;
+
+    const foodIcon = `<div class="icon-pill ${v.food ? 'food' : 'none'}" title="Food"><i class="ti ti-package" aria-hidden="true" style="font-size:10px;"></i></div>`;
+    const medIcon = `<div class="icon-pill ${v.med ? 'med' : 'none'}" title="Medicine"><i class="ti ti-first-aid-kit" aria-hidden="true" style="font-size:10px;"></i></div>`;
+    const shelterIcon = `<div class="icon-pill ${v.shelter ? 'shelter' : 'none'}" title="Shelter"><i class="ti ti-home" aria-hidden="true" style="font-size:10px;"></i></div>`;
+
+    cell.innerHTML = `
+      <div class="v-name">${v.name}</div>
+      <div class="v-pop">${v.pop} fam.</div>
+      <div class="v-icons">${foodIcon}${medIcon}${shelterIcon}</div>
+    `;
+    grid.appendChild(cell);
+  });
+}
+
+function filterVillages(filter, btn) {
+  activeFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(filter);
+}
+
+function openModal(idx) {
+  selectedVillage = idx;
+  const v = villages[idx];
+  resState = { food: v.food, med: v.med, shelter: v.shelter };
+  document.getElementById('modal-village-name').textContent = v.name;
+  updateResToggles();
+
+  const statusColors = { critical: '#EF4444', partial: '#F59E0B', covered: '#14B8A6', duplicate: '#8B5CF6' };
+  const statusLabels = { critical: 'Critical — No Aid', partial: 'Partial Aid', covered: 'Fully Covered', duplicate: 'Duplicate Delivery' };
+
+  document.getElementById('modal-details').innerHTML = `
+    <div class="village-detail-row"><span>Displaced families</span><span>${v.pop}</span></div>
+    <div class="village-detail-row"><span>Status</span><span style="color:${statusColors[v.status]};">${statusLabels[v.status]}</span></div>
+    <div class="village-detail-row"><span>Food packets</span><span>${v.food ? 'Delivered' : 'Not delivered'}</span></div>
+    <div class="village-detail-row"><span>Medical supplies</span><span>${v.med ? 'Delivered' : 'Not delivered'}</span></div>
+    <div class="village-detail-row" style="border:none;"><span>Temporary shelter</span><span>${v.shelter ? 'Set up' : 'Not available'}</span></div>
+  `;
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('open');
+    selectedVillage = null;
+  }
+}
+
+function toggleRes(type) {
+  resState[type] = !resState[type];
+  updateResToggles();
+}
+
+function updateResToggles() {
+  document.getElementById('rt-food').className = 'res-tog' + (resState.food ? ' on' : '');
+  document.getElementById('rt-med').className = 'res-tog' + (resState.med ? ' on' : '');
+  document.getElementById('rt-shelter').className = 'res-tog' + (resState.shelter ? ' on' : '');
+}
+
+function assignResources() {
+  if (selectedVillage === null) return;
+  const v = villages[selectedVillage];
+  v.food = resState.food;
+  v.med = resState.med;
+  v.shelter = resState.shelter;
+
+  const allCovered = v.food && v.med && v.shelter;
+  const none = !v.food && !v.med && !v.shelter;
+  const hasDuplicate = (v.food && v.med) && v.status === 'covered';
+
+  if (none) v.status = 'critical';
+  else if (allCovered) v.status = 'covered';
+  else v.status = 'partial';
+
+  updateCounters();
+  renderGrid(activeFilter);
+  document.getElementById('modal').classList.remove('open');
+}
+
+function updateCounters() {
+  const unserved = villages.filter(v => v.status === 'critical').length;
+  document.getElementById('unserved').textContent = unserved;
+  const totalFam = villages.filter(v => v.status === 'critical').reduce((a, v) => a + v.pop, 0);
+  document.getElementById('displaced').textContent = totalFam.toLocaleString();
+}
+
+renderGrid('all');
+</script>
+</body>
+</html>
